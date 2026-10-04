@@ -785,7 +785,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn-header" id="btn-api-settings" title="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" aria-label="API Settings">
+        <button class="btn-header" id="btn-api-settings" title="API Settings" aria-label="API Settings">
           <i class="fa-solid fa-key"></i>
           <span>API Key</span>
         </button>
@@ -945,12 +945,13 @@
     // ==========================================================================
 
     // WARNING:
-    // Never expose a production Groq API key in frontend JavaScript.
-    // For production, use a secure backend/serverless API proxy.
-    let GROQ_API_KEY = "YOUR_GROQ_API_KEY"; 
+    // Do not hard-code a Groq API key in this public HTML file.
+    // For testing, enter the key in the API Key dialog; it is stored only in this browser
+    // via localStorage. For production, use a secure backend/serverless API proxy.
+    let GROQ_API_KEY = ""; 
 
     // Configurable Groq model
-    const GROQ_MODEL = "llama-3.3-70b-versatile";
+    const GROQ_MODEL = "openai/gpt-oss-120b";
     const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
     // 10. SCHOOL INFORMATION OBJECT (Easily editable by administrator)
@@ -1179,7 +1180,7 @@ Verified School Information:
 
     async function sendMessageToGroq(userQuery) {
       // 14. Error handling: Check for missing API Key
-      if (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY" || GROQ_API_KEY.trim() === "") {
+      if (!GROQ_API_KEY || GROQ_API_KEY.trim() === "" || GROQ_API_KEY.trim() === "YOUR_GROQ_API_KEY") {
         // Fallback simulation mode for testing when user has not yet entered their key
         return simulateFallbackResponse(userQuery);
       }
@@ -1210,7 +1211,7 @@ Verified School Information:
         if (!response.ok) {
           const errorJson = await response.json().catch(() => ({}));
           console.error("Groq API Response Error:", errorJson);
-          throw new Error(errorJson.error?.message || `HTTP ${response.status}: Failed to communicate with Groq.`);
+          throw new Error(errorJson.error?.message || `HTTP ${response.status}: Failed to communicate with Groq. Check your API key and model configuration.`);
         }
 
         const data = await response.json();
@@ -1225,7 +1226,7 @@ Verified School Information:
       }
     }
 
-    // Offline simulation fallback for initial test before entering key
+    // Offline simulation fallback when no API key has been configured
     function simulateFallbackResponse(query) {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -1241,7 +1242,7 @@ Verified School Information:
           } else if (q.includes("principal")) {
             resolve(`👩‍🏫 **Principal:** ${SCHOOL_INFO.principal} leads ${SCHOOL_INFO.name}.`);
           } else {
-            resolve(`👋 Hello! Currently running in **Demo Mode**.\n\nTo activate real-time AI responses with the **Groq Llama-3.3** model, click the **"API Key"** button at the top header and enter your Groq API key (starts with \`gsk_...\`).\n\nYou can still test school information queries like **Timings**, **Admission**, and **Fees**!`);
+            resolve(`👋 Hello! Currently running in **Demo Mode**.\n\nTo activate real-time AI responses with the **Groq GPT-OSS 120B** model, click the **"API Key"** button at the top header and enter your Groq API key (starts with \`gsk_...\`).\n\nYou can still test school information queries like **Timings**, **Admission**, and **Fees**!`);
           }
         }, 600);
       });
