@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>School AI Assistant - Your Smart School Companion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <style>
+    /* ==========================================================================
+       CSS VARIABLES & THEME DEFINITIONS (School Indigo & Blue Aesthetic)
+       ========================================================================== */
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --indigo-accent: #4f46e5;
+      --indigo-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      --bg-main: #f8fafc;
+      --surface-card: #ffffff;
+      --border-subtle: #e2e8f0;
+      --border-focus: #3b82f6;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --bot-bubble-bg: #ffffff;
+      --user-bubble-bg: #2563eb;
+      --success: #10b981;
+      --danger: #ef4444;
+      --code-bg: #1e293b;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    /* Main Container */
+    .app-wrapper {
+      width: 100%;
+      max-width: 1080px;
+      height: 92vh;
+      background: var(--surface-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ==========================================================================
+       HEADER SECTION
+       ========================================================================== */
+    .chat-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .school-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--indigo-gradient);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+      flex-shrink: 0;
+    }
+
+    .brand-meta h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-header {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-header:hover {
+      background: var(--bg-main);
+      color: var(--text-main);
+      border-color: #cbd5e1;
+    }
+
+    .btn-header.danger:hover {
+      background: #fef2f2;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    /* ==========================================================================
+       CHAT MESSAGES SCROLL AREA
+       ========================================================================== */
+    .chat-body {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth;
+    }
+
+    /* Welcome Card */
+    .welcome-container {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 8px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .welcome-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .welcome-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--indigo-gradient);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .welcome-text h2 {
+      font-size: 1.15rem;
+      color: var(--text-main);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .welcome-text p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .quick-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .quick-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .chip-btn {
+      background: #f8fafc;
+      border: 1px solid var(--border-subtle);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-main);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .chip-btn:hover {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    /* Message Rows */
+    .message-row {
+      display: flex;
+      gap: 12px;
+      max-width: 82%;
+      animation: messageSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes messageSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-row.bot {
+      align-self: flex-start;
+    }
+
+    .avatar-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .message-row.bot .avatar-icon {
+      background: var(--indigo-gradient);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+    }
+
+    .message-row.user .avatar-icon {
+      background: #475569;
+      color: #ffffff;
+    }
+
+    .bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .message-bubble {
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      word-break: break-word;
+      position: relative;
+    }
+
+    .message-row.bot .message-bubble {
+      background: var(--bot-bubble-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-top-left-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .message-row.user .message-bubble {
+      background: var(--user-bubble-bg);
+      color: #ffffff;
+      border-top-right-radius: 4px;
+    }
+
+    /* Markdown Formatted Elements */
+    .message-bubble p {
+      margin-bottom: 8px;
+    }
+    .message-bubble p:last-child {
+      margin-bottom: 0;
+    }
+    .message-bubble ul, .message-bubble ol {
+      margin-left: 20px;
+      margin-bottom: 8px;
+    }
+    .message-bubble li {
+      margin-bottom: 4px;
+    }
+    .message-bubble strong {
+      font-weight: 700;
+    }
+    .message-bubble code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82em;
+      background: rgba(15, 23, 42, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .message-row.user .message-bubble code {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    .message-bubble pre {
+      background: var(--code-bg);
+      color: #f8fafc;
+      padding: 12px 14px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      margin: 8px 0;
+    }
+    .message-bubble pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Meta & Actions under Bot Bubble */
+    .bubble-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-left: 4px;
+    }
+
+    .time-badge {
+      font-size: 0.72rem;
+      color: var(--text-light);
+    }
+
+    .action-pill-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .action-pill-btn:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    /* Typing Indicator Bubble */
+    .typing-row {
+      display: flex;
+      gap: 12px;
+      align-self: flex-start;
+      align-items: center;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .typing-bubble {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      border-top-left-radius: 4px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .typing-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-right: 4px;
+      font-weight: 500;
+    }
+
+    .dot-pulse {
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+    .dot-pulse:nth-child(2) { animation-delay: 0.2s; }
+    .dot-pulse:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
+    }
+
+    /* Error Bubble */
+    .error-card {
+      background: #fef2f2 !important;
+      border-color: #fecaca !important;
+      color: #991b1b !important;
+    }
+
+    /* ==========================================================================
+       CHAT INPUT FOOTER AREA
+       ========================================================================== */
+    .chat-footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border-subtle);
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-form-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: #f8fafc;
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 6px 12px;
+      transition: all 0.2s ease;
+    }
+
+    .input-form-container:focus-within {
+      border-color: var(--border-focus);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .chat-textarea {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      resize: none;
+      font-size: 0.94rem;
+      line-height: 1.4;
+      max-height: 120px;
+      min-height: 24px;
+      padding: 8px 0;
+      color: var(--text-main);
+    }
+
+    .chat-textarea::placeholder {
+      color: var(--text-light);
+    }
+
+    .input-addon-btn {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+    }
+
+    .input-addon-btn:hover:not(:disabled) {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    .input-addon-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-send {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 0 18px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+      flex-shrink: 0;
+    }
+
+    .btn-send:hover:not(:disabled) {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-send:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-send:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .input-footnote {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-light);
+      padding: 0 4px;
+    }
+
+    .api-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .api-badge:hover {
+      color: var(--primary);
+    }
+
+    /* ==========================================================================
+       MODAL STYLES (About / Key Config)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-panel {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      max-width: 520px;
+      width: 100%;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      transform: scale(0.95);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-backdrop.active .modal-panel {
+      transform: scale(1);
+    }
+
+    .modal-head {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-head h3 {
+      font-size: 1.05rem;
+      color: var(--text-main);
+    }
+
+    .btn-close-modal {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .modal-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .input-group input {
+      padding: 10px 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+    }
+
+    .modal-actions {
+      padding: 14px 24px;
+      background: #f8fafc;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+
+    /* Mobile First Adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+      }
+      .app-wrapper {
+        height: 100vh;
+        max-width: 100%;
+        border-radius: 0;
+        border: none;
+      }
+      .chat-header {
+        padding: 12px 16px;
+      }
+      .brand-meta h1 {
+        font-size: 1rem;
+      }
+      .btn-header span {
+        display: none;
+      }
+      .chat-body {
+        padding: 16px;
+        gap: 14px;
+      }
+      .message-row {
+        max-width: 90%;
+      }
+      .quick-chips-grid {
+        grid-template-columns: 1fr;
+      }
+      .chat-footer {
+        padding: 12px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <!-- Top Header -->
+    <header class="chat-header">
+      <div class="brand-section">
+        <div class="school-logo" aria-hidden="true">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="brand-meta">
+          <h1>
+            School AI Assistant
+            <span class="status-badge"><span class="status-dot"></span> Online</span>
+          </h1>
+          <p class="brand-subtitle">Your Smart School Companion</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-header" id="btn-api-settings" title="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" aria-label="API Settings">
+          <i class="fa-solid fa-key"></i>
+          <span>API Key</span>
+        </button>
+        <button class="btn-header" id="btn-about" title="About Assistant" aria-label="About">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>About</span>
+        </button>
+        <button class="btn-header danger" id="btn-clear-chat" title="Clear Conversation" aria-label="Clear Chat">
+          <i class="fa-solid fa-trash-can"></i>
+          <span>Clear</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat Body -->
+    <main class="chat-body" id="chat-stream" role="log" aria-live="polite">
+      <!-- Welcome Screen Component -->
+      <div class="welcome-container" id="welcome-card">
+        <div class="welcome-banner">
+          <div class="welcome-avatar">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div class="welcome-text">
+            <h2>👋 Hello! I'm your School AI Assistant.</h2>
+            <p>I can help you with school information, studies, homework, exams, admissions, and many other questions. How can I help you today?</p>
+          </div>
+        </div>
+
+        <div class="quick-title">
+          <i class="fa-solid fa-bolt text-primary"></i> Quick Questions
+        </div>
+        <div class="quick-chips-grid" id="quick-buttons-container">
+          <button class="chip-btn" data-prompt="What is the general school information and contact details?">
+            <span>🏫</span> School Information
+          </button>
+          <button class="chip-btn" data-prompt="Can you give me homework help and explain how to solve math & science problems?">
+            <span>📚</span> Homework Help
+          </button>
+          <button class="chip-btn" data-prompt="When is the upcoming exam schedule and how should students prepare?">
+            <span>📝</span> Exam Information
+          </button>
+          <button class="chip-btn" data-prompt="What is the admission procedure and documents needed?">
+            <span>🎓</span> Admission
+          </button>
+          <button class="chip-btn" data-prompt="What is the fee payment schedule and fee policy?">
+            <span>💰</span> Fees
+          </button>
+          <button class="chip-btn" data-prompt="What are the upcoming school holidays and vacation dates?">
+            <span>🗓️</span> Holidays
+          </button>
+          <button class="chip-btn" data-prompt="What are the daily school timings for students and office hours?">
+            <span>⏰</span> School Timings
+          </button>
+          <button class="chip-btn" data-prompt="How do I contact the principal or administration office?">
+            <span>📖</span> Ask a Question
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Typing Indicator (Hidden by default) -->
+    <div id="typing-indicator" class="typing-row" style="display: none; padding: 0 24px 12px 24px;">
+      <div class="avatar-icon"><i class="fa-solid fa-robot"></i></div>
+      <div class="typing-bubble">
+        <span class="typing-label">AI is thinking</span>
+        <span class="dot-pulse"></span>
+        <span class="dot-pulse"></span>
+        <span class="dot-pulse"></span>
+      </div>
+    </div>
+
+    <!-- Message Input Bar -->
+    <footer class="chat-footer">
+      <form id="chat-form">
+        <div class="input-form-container">
+          <button type="button" class="input-addon-btn" id="btn-mic" title="Voice Input (UI demonstration)" aria-label="Microphone">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button type="button" class="input-addon-btn" disabled title="Attachment (Disabled in frontend demo)" aria-label="Attachments">
+            <i class="fa-solid fa-paperclip"></i>
+          </button>
+
+          <textarea 
+            id="user-input" 
+            class="chat-textarea" 
+            placeholder="Ask me anything about school..." 
+            rows="1"
+            aria-label="Ask me anything about school"
+            required
+          ></textarea>
+
+          <button type="submit" id="btn-send" class="btn-send" aria-label="Send message">
+            <span>Send</span>
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </form>
+      <div class="input-footnote">
+        <span>Press <strong>Enter</strong> to send • <strong>Shift + Enter</strong> for new line</span>
+        <span class="api-badge" id="open-api-modal"><i class="fa-solid fa-sliders"></i> Powered by Groq Llama-3.3</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- API Key Modal -->
+  <div class="modal-backdrop" id="api-modal">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <h3 id="modal-title"><i class="fa-solid fa-key" style="color: var(--primary);"></i> Groq API Configuration</h3>
+        <button class="btn-close-modal" id="close-api-modal" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-content">
+        <p>Enter your <strong>Groq API Key</strong> below to enable live responses from Groq's high-speed inference engine.</p>
+        <div class="input-group">
+          <label for="input-groq-key">Groq API Key (gsk_...)</label>
+          <input type="password" id="input-groq-key" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+        </div>
+        <p style="font-size: 0.78rem; color: #dc2626;">
+          ⚠️ <strong>Security Note:</strong> Client-side keys are visible in the browser developer tools. Use this for testing/demonstration only. For production, keep your API key on a backend server or serverless proxy.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="cancel-api-modal">Cancel</button>
+        <button class="btn-primary" id="save-api-modal">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div class="modal-backdrop" id="about-modal">
+    <div class="modal-panel" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-graduation-cap" style="color: var(--primary);"></i> About School AI Assistant</h3>
+        <button class="btn-close-modal" id="close-about-modal">&times;</button>
+      </div>
+      <div class="modal-content">
+        <p><strong>School AI Assistant</strong> is an AI-powered conversational guide created for students, parents, and teachers.</p>
+        <p>It provides verified school policy guidance, academic explanations, homework guidance, and general educational help using the ultra-fast <strong>Groq API</strong>.</p>
+        <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 0.8rem;">
+          <div>🏫 <strong>School:</strong> Springfield International Academy</div>
+          <div>📞 <strong>Contact:</strong> +1 (555) 234-5678 / office@school.edu</div>
+          <div>🕒 <strong>Hours:</strong> 8:00 AM - 2:00 PM (Mon-Fri)</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="ok-about-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT LOGIC
+       ========================================================================== -->
+  <script>
+    // ==========================================================================
+    // 1. CONFIGURATION, KEYS & SECURITY WARNING
+    // ==========================================================================
+
+    // WARNING:
+    // Never expose a production Groq API key in frontend JavaScript.
+    // For production, use a secure backend/serverless API proxy.
+    let GROQ_API_KEY = "YOUR_GROQ_API_KEY"; 
+
+    // Configurable Groq model
+    const GROQ_MODEL = "llama-3.3-70b-versatile";
+    const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+
+    // 10. SCHOOL INFORMATION OBJECT (Easily editable by administrator)
+    const SCHOOL_INFO = {
+      name: "Springfield International Academy",
+      address: "100 Academic Way, Springfield, IL 62701",
+      phone: "+1 (555) 234-5678",
+      email: "info@springfieldacademy.edu",
+      website: "https://www.springfieldacademy.edu",
+      timings: "8:00 AM - 2:00 PM (Monday to Friday)",
+      principal: "Dr. Eleanor Vance",
+      admission: "Admissions open for Pre-K through Grade 12 for the upcoming academic year. Applications require previous transcripts, recommendation letters, and birth certificate. Contact admissions office directly for schedule.",
+      fees: "Tuition is billed quarterly. Pre-K & Primary: $3,200/quarter; Middle & High School: $4,500/quarter. Payment plans and sibling discounts are available upon application to the accounts desk.",
+      holidays: "Upcoming holidays: Fall Break (Oct 18-21), Thanksgiving Recess (Nov 27-29), Winter Vacation (Dec 23 - Jan 6), Spring Recess (March 24-28)."
+    };
+
+    // 9. SYSTEM PROMPT
+    const SYSTEM_PROMPT = `You are School AI Assistant, a helpful, polite and knowledgeable virtual assistant for a school.
+Your job is to help students, parents and teachers.
+
+Always:
+* Be polite and respectful.
+* Give clear and easy-to-understand answers.
+* Use simple language.
+* Help students understand concepts instead of simply encouraging cheating.
+* If a question is related to school information and the exact information is not provided in the school facts below, clearly say: "I don't have confirmed information about that. Please contact the school office."
+* Never invent school fees, dates, staff names, exam schedules, phone numbers or other official information.
+* For academic questions, explain step-by-step when appropriate.
+* Keep answers concise but useful.
+* If the user asks an unsafe or inappropriate question, respond appropriately and safely.
+* Do not claim to be a human.
+* Identify yourself as the School AI Assistant when relevant.
+
+Verified School Information:
+- School Name: ${SCHOOL_INFO.name}
+- Campus Address: ${SCHOOL_INFO.address}
+- Phone Number: ${SCHOOL_INFO.phone}
+- Email: ${SCHOOL_INFO.email}
+- Website: ${SCHOOL_INFO.website}
+- School Timings: ${SCHOOL_INFO.timings}
+- Principal: ${SCHOOL_INFO.principal}
+- Admission Details: ${SCHOOL_INFO.admission}
+- Fee Structure: ${SCHOOL_INFO.fees}
+- Holiday Schedule: ${SCHOOL_INFO.holidays}`;
+
+    // 12. CHAT HISTORY MEMORY
+    // Stores history during session; capped to recent turns
+    let messages = [];
+
+    // Track the last user query for Regenerate functionality
+    let lastUserQuery = "";
+
+    // DOM Elements
+    const chatStream = document.getElementById("chat-stream");
+    const welcomeCard = document.getElementById("welcome-card");
+    const chatForm = document.getElementById("chat-form");
+    const userInput = document.getElementById("user-input");
+    const btnSend = document.getElementById("btn-send");
+    const typingIndicator = document.getElementById("typing-indicator");
+    const btnClearChat = document.getElementById("btn-clear-chat");
+    const quickButtons = document.querySelectorAll(".chip-btn");
+    const btnMic = document.getElementById("btn-mic");
+
+    // Modal elements
+    const apiModal = document.getElementById("api-modal");
+    const aboutModal = document.getElementById("about-modal");
+    const btnApiSettings = document.getElementById("btn-api-settings");
+    const openApiModal = document.getElementById("open-api-modal");
+    const closeApiModal = document.getElementById("close-api-modal");
+    const cancelApiModal = document.getElementById("cancel-api-modal");
+    const saveApiModal = document.getElementById("save-api-modal");
+    const inputGroqKey = document.getElementById("input-groq-key");
+    const btnAbout = document.getElementById("btn-about");
+    const closeAboutModal = document.getElementById("close-about-modal");
+    const okAboutModal = document.getElementById("ok-about-modal");
+
+    // Load any saved key from localStorage if available
+    const savedKey = localStorage.getItem("DEMO_GROQ_API_KEY");
+    if (savedKey) {
+      GROQ_API_KEY = savedKey;
+      inputGroqKey.value = savedKey;
+    }
+
+    // ==========================================================================
+    // 2. TEXT FORMATTING & MARKDOWN RENDERER
+    // ==========================================================================
+
+    function escapeHTML(text) {
+      const p = document.createElement("p");
+      p.textContent = text;
+      return p.innerHTML;
+    }
+
+    function renderMarkdown(text) {
+      let raw = escapeHTML(text);
+
+      // Code blocks ```code```
+      raw = raw.replace(/```([a-z]*)\n([\s\S]*?)```/g, function(match, lang, code) {
+        return `<pre><code>${code.trim()}</code></pre>`;
+      });
+
+      // Inline code `code`
+      raw = raw.replace(/`([^`]+)`/g, "<code>$1</code>");
+
+      // Bold **text**
+      raw = raw.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+      // Italic *text*
+      raw = raw.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+      // Bullet lists
+      raw = raw.replace(/^\s*[-*]\s+(.*)$/gim, "<li>$1</li>");
+      raw = raw.replace(/(<li>.*<\/li>)/gms, "<ul>$1</ul>");
+
+      // Numbered lists
+      raw = raw.replace(/^\s*\d+\.\s+(.*)$/gim, "<li>$1</li>");
+
+      // Paragraphs & newlines
+      const paragraphs = raw.split(/\n\n+/);
+      return paragraphs.map(p => {
+        if (p.startsWith("<pre>") || p.startsWith("<ul>") || p.startsWith("<ol>")) {
+          return p;
+        }
+        return `<p>${p.replace(/\n/g, "<br>")}</p>`;
+      }).join("");
+    }
+
+    function formatTime(date = new Date()) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ==========================================================================
+    // 3. UI RENDERING FUNCTIONS
+    // ==========================================================================
+
+    function appendUserMessage(text) {
+      if (welcomeCard && welcomeCard.parentNode) {
+        welcomeCard.style.display = "none";
+      }
+
+      const row = document.createElement("div");
+      row.className = "message-row user";
+      row.innerHTML = `
+        <div class="avatar-icon" aria-hidden="true"><i class="fa-solid fa-user"></i></div>
+        <div class="bubble-wrapper">
+          <div class="message-bubble">
+            <p>${escapeHTML(text).replace(/\n/g, '<br>')}</p>
+          </div>
+          <div class="bubble-meta-row" style="justify-content: flex-end;">
+            <span class="time-badge">${formatTime()}</span>
+          </div>
+        </div>
+      `;
+
+      chatStream.appendChild(row);
+      scrollToBottom();
+    }
+
+    function appendAIMessage(content, isError = false) {
+      const row = document.createElement("div");
+      row.className = "message-row bot";
+
+      const formattedContent = renderMarkdown(content);
+      const uniqueMsgId = "msg-" + Date.now();
+
+      row.innerHTML = `
+        <div class="avatar-icon" aria-hidden="true"><i class="fa-solid fa-robot"></i></div>
+        <div class="bubble-wrapper">
+          <div class="message-bubble ${isError ? 'error-card' : ''}" id="${uniqueMsgId}">
+            ${formattedContent}
+          </div>
+          <div class="bubble-meta-row">
+            <span class="time-badge">${formatTime()}</span>
+            ${!isError ? `
+              <button class="action-pill-btn btn-copy" data-target="${uniqueMsgId}" title="Copy response">
+                <i class="fa-regular fa-copy"></i> <span>Copy</span>
+              </button>
+              <button class="action-pill-btn btn-regen" title="Regenerate last response">
+                <i class="fa-solid fa-arrows-rotate"></i> <span>Regenerate</span>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+      chatStream.appendChild(row);
+      scrollToBottom();
+
+      // Bind Copy Button
+      const copyBtn = row.querySelector(".btn-copy");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", () => {
+          navigator.clipboard.writeText(content).then(() => {
+            const span = copyBtn.querySelector("span");
+            const icon = copyBtn.querySelector("i");
+            span.textContent = "Copied!";
+            icon.className = "fa-solid fa-check";
+            setTimeout(() => {
+              span.textContent = "Copy";
+              icon.className = "fa-regular fa-copy";
+            }, 2000);
+          }).catch(err => {
+            console.error("Clipboard copy failed:", err);
+          });
+        });
+      }
+
+      // Bind Regenerate Button
+      const regenBtn = row.querySelector(".btn-regen");
+      if (regenBtn) {
+        regenBtn.addEventListener("click", () => {
+          if (lastUserQuery) {
+            handleSendMessage(lastUserQuery, true);
+          }
+        });
+      }
+    }
+
+    function scrollToBottom() {
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+
+    // ==========================================================================
+    // 4. GROQ API INTEGRATION (11. API FUNCTION)
+    // ==========================================================================
+
+    async function sendMessageToGroq(userQuery) {
+      // 14. Error handling: Check for missing API Key
+      if (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY" || GROQ_API_KEY.trim() === "") {
+        // Fallback simulation mode for testing when user has not yet entered their key
+        return simulateFallbackResponse(userQuery);
+      }
+
+      // Prepare sliding window of conversation history (last 10 turns to avoid giant payloads)
+      const recentHistory = messages.slice(-10);
+
+      const requestPayload = {
+        model: GROQ_MODEL,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...recentHistory
+        ],
+        temperature: 0.3,
+        max_tokens: 800
+      };
+
+      try {
+        const response = await fetch(GROQ_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${GROQ_API_KEY.trim()}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(requestPayload)
+        });
+
+        if (!response.ok) {
+          const errorJson = await response.json().catch(() => ({}));
+          console.error("Groq API Response Error:", errorJson);
+          throw new Error(errorJson.error?.message || `HTTP ${response.status}: Failed to communicate with Groq.`);
+        }
+
+        const data = await response.json();
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+          return data.choices[0].message.content;
+        } else {
+          throw new Error("Invalid response format received from Groq API.");
+        }
+      } catch (err) {
+        console.error("sendMessageToGroq Exception:", err);
+        throw err;
+      }
+    }
+
+    // Offline simulation fallback for initial test before entering key
+    function simulateFallbackResponse(query) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const q = query.toLowerCase();
+          if (q.includes("timing") || q.includes("time") || q.includes("hour")) {
+            resolve(`⏰ **School Timings:**\n${SCHOOL_INFO.timings}\n\nOur administrative office is open from 8:00 AM to 3:30 PM for parent visits.`);
+          } else if (q.includes("admission") || q.includes("apply") || q.includes("document")) {
+            resolve(`🎓 **Admission Information:**\n${SCHOOL_INFO.admission}\n\nYou can reach our admissions department directly at **${SCHOOL_INFO.phone}**.`);
+          } else if (q.includes("fee") || q.includes("cost") || q.includes("pay")) {
+            resolve(`💰 **Fee Policy:**\n${SCHOOL_INFO.fees}\n\n*Note: Fee statements can be downloaded through the official parent portal.*`);
+          } else if (q.includes("holiday") || q.includes("break") || q.includes("vacation")) {
+            resolve(`🗓️ **Upcoming Holidays:**\n${SCHOOL_INFO.holidays}`);
+          } else if (q.includes("principal")) {
+            resolve(`👩‍🏫 **Principal:** ${SCHOOL_INFO.principal} leads ${SCHOOL_INFO.name}.`);
+          } else {
+            resolve(`👋 Hello! Currently running in **Demo Mode**.\n\nTo activate real-time AI responses with the **Groq Llama-3.3** model, click the **"API Key"** button at the top header and enter your Groq API key (starts with \`gsk_...\`).\n\nYou can still test school information queries like **Timings**, **Admission**, and **Fees**!`);
+          }
+        }, 600);
+      });
+    }
+
+    // ==========================================================================
+    // 5. MESSAGE DISPATCH HANDLER
+    // ==========================================================================
+
+    async function handleSendMessage(text, isRegenerate = false) {
+      const cleanText = text.trim();
+      if (!cleanText) return;
+
+      lastUserQuery = cleanText;
+
+      if (!isRegenerate) {
+        appendUserMessage(cleanText);
+        messages.push({ role: "user", content: cleanText });
+        userInput.value = "";
+        autoResizeTextarea();
+      }
+
+      // Show Loading indicator
+      typingIndicator.style.display = "flex";
+      btnSend.disabled = true;
+      scrollToBottom();
+
+      try {
+        const aiResponse = await sendMessageToGroq(cleanText);
+        messages.push({ role: "assistant", content: aiResponse });
+        appendAIMessage(aiResponse);
+      } catch (err) {
+        const errorHelp = (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY")
+          ? "Please configure your Groq API key first by clicking the **API Key** button in the header."
+          : "Sorry, I couldn't connect to the AI right now. Please check your internet connection or verify your Groq API key.";
+        
+        appendAIMessage(`⚠️ **Connection Notice:**\n${errorHelp}\n\n*(Technical error: ${escapeHTML(err.message)})*`, true);
+      } finally {
+        typingIndicator.style.display = "none";
+        btnSend.disabled = false;
+        userInput.focus();
+        scrollToBottom();
+      }
+    }
+
+    // ==========================================================================
+    // 6. EVENT LISTENERS & USER INTERACTIONS
+    // ==========================================================================
+
+    // Auto-resize textarea as user types
+    function autoResizeTextarea() {
+      userInput.style.height = "auto";
+      userInput.style.height = Math.min(userInput.scrollHeight, 120) + "px";
+    }
+
+    userInput.addEventListener("input", autoResizeTextarea);
+
+    // Enter to Send, Shift+Enter for newline
+    userInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        chatForm.dispatchEvent(new Event("submit"));
+      }
+    });
+
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      handleSendMessage(userInput.value);
+    });
+
+    // Quick Question Buttons
+    quickButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const prompt = btn.getAttribute("data-prompt");
+        if (prompt) {
+          handleSendMessage(prompt);
+        }
+      });
+    });
+
+    // 15. Clear Chat with confirmation
+    btnClearChat.addEventListener("click", () => {
+      const confirmClear = confirm("Are you sure you want to clear this conversation?");
+      if (confirmClear) {
+        // Reset chat stream
+        chatStream.innerHTML = "";
+        messages = [];
+        lastUserQuery = "";
+        
+        // Restore Welcome Card
+        chatStream.appendChild(welcomeCard);
+        welcomeCard.style.display = "block";
+      }
+    });
+
+    // Microphone button (UI demonstration indicator)
+    btnMic.addEventListener("click", () => {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.start();
+        btnMic.style.color = "var(--danger)";
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          userInput.value = transcript;
+          autoResizeTextarea();
+          btnMic.style.color = "";
+        };
+        recognition.onerror = () => {
+          btnMic.style.color = "";
+        };
+        recognition.onend = () => {
+          btnMic.style.color = "";
+        };
+      } else {
+        alert("Speech Recognition is not supported by your browser. Please use Chrome/Edge or type your question.");
+      }
+    });
+
+    // Modal Control: API Settings
+    function toggleModal(modal, show) {
+      if (show) modal.classList.add("active");
+      else modal.classList.remove("active");
+    }
+
+    btnApiSettings.addEventListener("click", () => toggleModal(apiModal, true));
+    openApiModal.addEventListener("click", () => toggleModal(apiModal, true));
+    closeApiModal.addEventListener("click", () => toggleModal(apiModal, false));
+    cancelApiModal.addEventListener("click", () => toggleModal(apiModal, false));
+
+    saveApiModal.addEventListener("click", () => {
+      const val = inputGroqKey.value.trim();
+      GROQ_API_KEY = val;
+      localStorage.setItem("DEMO_GROQ_API_KEY", val);
+      toggleModal(apiModal, false);
+      alert("Groq API Key updated successfully!");
+    });
+
+    // Modal Control: About
+    btnAbout.addEventListener("click", () => toggleModal(aboutModal, true));
+    closeAboutModal.addEventListener("click", () => toggleModal(aboutModal, false));
+    okAboutModal.addEventListener("click", () => toggleModal(aboutModal, false));
+
+    // Close on clicking backdrop
+    [apiModal, aboutModal].forEach(modal => {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) toggleModal(modal, false);
+      });
+    });
+  </script>
+</body>
+</html>
