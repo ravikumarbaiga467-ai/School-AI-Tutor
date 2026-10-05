@@ -1,1 +1,1 @@
-# School-AI-Tutor
+# School-AI-chatbot
